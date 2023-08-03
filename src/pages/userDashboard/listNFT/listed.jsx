@@ -136,7 +136,7 @@ const Listed = () => {
 
   const marketPlaceURL =
     nftDetails?.collection_name !== "Genadrop 1 of 1" && nftDetails?.chain !== 4160
-      ? `/marketplace/collections/${
+      ? `/marketplace/collections/${nftDetails?.chain}~${
           nftDetails?.chain === 4160 ? nftDetails?.collection_name : nftDetails?.collection_contract
         }/${nftDetails?.Id}`
       : `/marketplace/1of1/${nftDetails?.chain}/${nftDetails?.Id}`;

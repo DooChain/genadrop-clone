@@ -774,9 +774,19 @@ export const GET_FEATURED_SINGLE_NFT = gql`
   }
 `;
 
+const avalancheAddress =
+  process.env.REACT_APP_ENV_STAGING === "true"
+    ? ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS)
+    : ethers.utils.hexlify(process.env.REACT_APP_GENA_MAINNET_SINGLE_ADDRESS);
+
+const avalancheSoulBoundAddress =
+  process.env.REACT_APP_ENV_STAGING === "true"
+    ? ethers.utils.hexlify(process.env?.REACT_APP_AVAX_TESTNET_SOULBOUND_ADDRESS)
+    : ethers.utils.hexlify(process.env?.REACT_APP_AVAX_MAINNET_SOULBOUND_ADDRESS);
+
 export const GET_AVAX_SINGLE_NFTS = gql`
   query MyQuery {
-    nfts(orderBy: createdAtTimestamp, orderDirection: desc) {
+    nfts(orderBy: createdAtTimestamp, orderDirection: desc, where: { collection_in: ["${avalancheAddress}"]}) {
       category
       chain
       createdAtTimestamp
@@ -795,21 +805,105 @@ export const GET_AVAX_SINGLE_NFTS = gql`
 `;
 
 export const GET_AVAX_SINGLE_NFTS_WITH_LIMIT = gql`
-  query MyQuery {
-    nfts(first: 10, orderBy: createdAtTimestamp, orderDirection: desc) {
-      category
-      chain
-      createdAtTimestamp
+query MyQuery {
+  nfts(orderBy: createdAtTimestamp, orderDirection: desc, first: 10, where: { collection_in: ["${avalancheAddress}"]}) {
+    category
+    chain
+    createdAtTimestamp
+    id
+    isSold
+    isListed
+    isSoulBound
+    price
+    tokenID
+    owner {
       id
-      isSold
-      isListed
-      isSoulBound
-      price
-      tokenID
-      owner {
+    }
+    tokenIPFSPath
+  }
+}
+`;
+
+export const GET_AVAX_SOUL_BOUND_NFTS = gql`
+query MyQuery {
+  nfts(orderBy: createdAtTimestamp, orderDirection: desc, where: { collection_in: ["${avalancheSoulBoundAddress}"]}) {
+    category
+    chain
+    createdAtTimestamp
+    id
+    isSold
+    isListed
+    isSoulBound
+    price
+    tokenID
+    owner {
+      id
+    }
+    tokenIPFSPath
+  }
+}
+`;
+export const GET_AVAX_SOUL_BOUND_NFTS_WITH_LIMITS = gql`
+query MyQuery {
+  nfts(orderBy: createdAtTimestamp, orderDirection: desc, first: 10, where: { collection_in: ["${avalancheSoulBoundAddress}"]}) {
+    category
+    chain
+    createdAtTimestamp
+    id
+    isSold
+    isListed
+    isSoulBound
+    price
+    tokenID
+    owner {
+      id
+    }
+    tokenIPFSPath
+  }
+}
+`;
+
+export const GET_ALL_AVALANCHE_COLLECTIONS = gql`
+  query MyQuery {
+    collections {
+      description
+      id
+      creator {
         id
       }
-      tokenIPFSPath
+      name
+      nfts {
+        chain
+        category
+        createdAtTimestamp
+        id
+        isSold
+        isListed
+        price
+        collection {
+          name
+          id
+        }
+        tokenID
+        owner {
+          id
+        }
+
+        tokenIPFSPath
+        transactions {
+          id
+          txDate
+          price
+          txId
+          to {
+            id
+          }
+          from {
+            id
+          }
+          type
+        }
+      }
     }
   }
 `;

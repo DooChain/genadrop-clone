@@ -11,6 +11,9 @@ import {
   GET_AURORA_SOUL_BOUND_NFTS_WITH_LIMIT,
   GET_AVAX_SINGLE_NFTS,
   GET_AVAX_SINGLE_NFTS_WITH_LIMIT,
+  GET_AVAX_SOUL_BOUND_NFTS,
+  GET_AVAX_SOUL_BOUND_NFTS_WITH_LIMITS,
+  GET_ALL_AVALANCHE_COLLECTIONS,
   GET_CELO_GRAPH_COLLECITONS,
   GET_CELO_NFT,
   GET_CELO_SINGLE_NFT,
@@ -207,10 +210,18 @@ export const getArbitrumMintedNfts = async (address) => {
 };
 
 export const getAvaxMintedNfts = async (address) => {
-  const { data: avaxData, error: avaxError } = await avalancheClient.query(GET_USER_NFT, { id: address }).toPromise();
+  const { data, error: avaxError } = await avalancheClient.query(GET_USER_NFT, { id: address }).toPromise();
   if (avaxError) return;
-  const response = await getSingleGraphNfts(avaxData?.user?.nfts, address);
-  const avaxMintedNfts = response?.filter((NFTS) => NFTS?.sold !== true);
+
+  const filterAddress =
+    process.env.REACT_APP_ENV_STAGING === "true"
+      ? ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS)
+      : ethers.utils.hexlify(process.env.REACT_APP_AVAX_MAINNET_SINGLE_ADDRESS);
+  const response = await getSingleGraphNfts(data?.user?.nfts, data?.user?.id);
+  const avaxMintedNfts = response?.filter(
+    (NFTS) =>
+      !NFTS?.sold && (NFTS?.collectionId === soulboundSingleFilterAddress || NFTS?.collectionId === filterAddress)
+  );
   return avaxMintedNfts;
 };
 
@@ -248,6 +259,14 @@ export const getCeloCollectedNFTs = async (address) => {
 
 export const getPolygonSingleCollection = async (address) => {
   const { data, error } = await polygonClient.query(GET_SINGLE_GRAPH_COLLECTION, { id: address }).toPromise();
+  if (error) return;
+  const nftData = await getGraphCollection(data?.collection?.nfts, data?.collection);
+  const collectionData = await getGraphCollectionData(data?.collection);
+  return [nftData, collectionData];
+};
+
+export const getAvalancheSingleCollection = async (address) => {
+  const { data, error } = await avalancheClient.query(GET_SINGLE_GRAPH_COLLECTION, { id: address }).toPromise();
   if (error) return;
   const nftData = await getGraphCollection(data?.collection?.nfts, data?.collection);
   const collectionData = await getGraphCollectionData(data?.collection);
@@ -310,6 +329,13 @@ export const getAvaxCollectedNFTs = async (address) => {
 export const getCeloUserCollections = async (account) => {
   const { data, error: celoError } = await celoClient.query(GET_USER_COLLECTIONS, { id: account }).toPromise();
   if (celoError) return;
+  const result = await getGraphCollections(data?.user?.collections);
+  return result;
+};
+
+export const getAvaxUserCollections = async (account) => {
+  const { data, error: avaxError } = await avalancheClient.query(GET_USER_COLLECTIONS, { id: account }).toPromise();
+  if (avaxError) return;
   const result = await getGraphCollections(data?.user?.collections);
   return result;
 };
@@ -439,9 +465,25 @@ export const getAllAvalancheNfts = async (limit) => {
   const { data: graphData, error } = await avalancheClient
     .query(limit ? GET_AVAX_SINGLE_NFTS_WITH_LIMIT : GET_AVAX_SINGLE_NFTS)
     .toPromise();
-  if (error) return [];
-  const data = await getSingleGraphNfts(graphData?.nfts);
+  const { data: sbData, error: sbError } = await avalancheClient
+    .query(limit ? GET_AVAX_SOUL_BOUND_NFTS_WITH_LIMITS : GET_AVAX_SOUL_BOUND_NFTS)
+    .toPromise();
+
+  if (error || sbError) return [];
+  const data = getSingleGraphNfts([...graphData.nfts, ...sbData.nfts]);
   return data;
+};
+
+export const getAllAvalancheCollections = async () => {
+  const { data, error } = await avalancheClient.query(GET_ALL_AVALANCHE_COLLECTIONS).toPromise();
+  if (error) return [];
+  const result = await getGraphCollections(data?.collections);
+  const filterAddress =
+    process.env.REACT_APP_ENV_STAGING === "true"
+      ? ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS)
+      : ethers.utils.hexlify(process.env.REACT_APP_AVAX_MAINNET_SINGLE_ADDRESS);
+  const res = result?.filter((aurora) => aurora?.Id !== filterAddress && aurora?.Id !== soulboundSingleFilterAddress);
+  return res;
 };
 
 export const getAllAuroraCollections = async () => {

@@ -421,9 +421,11 @@ export const getGraphCollection = async (collection, mainnet) => {
         nftObj.chain = nft.chain;
         nftObj.owner = nft?.owner?.id;
         nftObj.Id = nft?.id;
+        nftObj.tokenID = nft.tokenID;
         const getPrice = nft?.price;
         nftObj.collectionPrice = getPrice * PRICE_CONVERSION_VALUE;
         nftObj.price = nft.price * PRICE_CONVERSION_VALUE;
+        nftObj.isListed = nft.isListed;
         nftObj.sold = nft.isSold;
         nftObj.ipfs_data = data;
         nftObj.properties = data?.properties;

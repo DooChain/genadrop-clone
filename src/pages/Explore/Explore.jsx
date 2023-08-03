@@ -18,6 +18,7 @@ import supportedChains from "../../utils/supportedChains";
 import {
   getAllAlgorandCollections,
   getAuroraSingleCollection,
+  getAvalancheSingleCollection,
   getCeloSingleCollection,
   getPolygonSingleCollection,
 } from "../../renderless/fetch-data/fetchUserGraphData";
@@ -72,6 +73,8 @@ const Explore = () => {
       const splitCollectionId = collectionName.split("~")[1];
       if (supportedChains[chainId]?.chain === "Polygon") {
         [nftData, collectionData] = await getPolygonSingleCollection(splitCollectionId);
+      } else if (supportedChains[chainId]?.chain === "Avalanche") {
+        [nftData, collectionData] = await getAvalancheSingleCollection(splitCollectionId);
       } else if (supportedChains[chainId]?.chain === "Celo") {
         [nftData, collectionData] = await getCeloSingleCollection(splitCollectionId);
       } else if (supportedChains[chainId]?.chain === "Aurora") {

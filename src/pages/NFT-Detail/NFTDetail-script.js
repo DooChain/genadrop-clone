@@ -17,6 +17,7 @@ import {
   getAllAvalancheNfts,
   getAllNearNfts,
   getPolygonSingleCollection,
+  getAvalancheSingleCollection,
   getAuroraSingleCollection,
   getCeloSingleCollection,
 } from "../../renderless/fetch-data/fetchUserGraphData";
@@ -81,6 +82,11 @@ export const getGraphData = async ({ graphProps }) => {
       let collection = [];
       if (supportedChains[collectionChain]?.chain === "Polygon") {
         const [nftsData, _] = await getPolygonSingleCollection(collectionId);
+        nft = nftsData.find((key) => key.Id === nftId);
+        collection = nftsData;
+        transactionHistory = await getTransactions(nft.transactions);
+      } else if (supportedChains[collectionChain]?.chain === "Avalanche") {
+        const [nftsData, _] = await getAvalancheSingleCollection(collectionId);
         nft = nftsData.find((key) => key.Id === nftId);
         collection = nftsData;
         transactionHistory = await getTransactions(nft.transactions);
