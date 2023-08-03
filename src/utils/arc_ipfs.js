@@ -2136,13 +2136,16 @@ export async function initializeContract(contractProps) {
   }
   const signer = await connector.getSigner();
   const collectionContract = new ethers.Contract(minterAddress, mintCollectionAbi, signer);
-  const tx = await collectionContract.createCollection(name, name.substring(0, 3).toUpperCase(), description);
+  const tx = await collectionContract.createCollection(name, name.substring(0, 3).toUpperCase(), description, {
+    gasLimit: ethers.utils.parseUnits("0.000000000001", "ether"),
+  });
   dispatch(setLoader("minting"));
   await tx.wait();
   dispatch(setLoader(""));
   const getCollectionAddresses = await collectionContract.collectionsOf(account);
   const collectionAddresses = [...getCollectionAddresses];
   const contract = new ethers.Contract(collectionAddresses.pop(), mintAbi, signer);
+  console.log("contract", contract);
   return contract;
 }
 
@@ -2364,7 +2367,9 @@ export async function mintToAvax(celoProps) {
     }
   }
   try {
-    tx = await contract.mintBatch(receiverAddress, ids, uris);
+    const newIds = ids.map(() => 0);
+    console.log("ids, uris", newIds, uris);
+    tx = await contract.mintBatch(receiverAddress, newIds, uris);
     await tx.wait();
     // await marketContract.createBulkMarketItem(
     //   contract.address,

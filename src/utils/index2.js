@@ -153,10 +153,10 @@ export const handleDownload = async (input) => {
     return { ...v, attributes: transformAttribute };
   });
 
-  if (currentPlan === "free") {
-    dispatch(setToggleUpgradeModal(true));
-    return;
-  }
+  // if (currentPlan === "free") {
+  //   dispatch(setToggleUpgradeModal(true));
+  //   return;
+  // }
   if (!name) {
     return dispatch(
       setNotification({
