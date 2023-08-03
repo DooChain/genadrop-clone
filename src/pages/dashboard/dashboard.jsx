@@ -42,7 +42,6 @@ import { ReactComponent as Twitter } from "../../assets/icon-twitter-blue.svg";
 import { ReactComponent as Discord } from "../../assets/icon-discord-blue.svg";
 import { ReactComponent as Instagram } from "../../assets/icon-instagram-blue.svg";
 import { ReactComponent as LinkIcon } from "../../assets/icon-link.svg";
-import { getUserNearCollection } from "../../renderless/fetch-data/fetchNearCollectionData";
 
 const Dashboard = () => {
   const location = useLocation();
@@ -104,27 +103,11 @@ const Dashboard = () => {
     (async function getUserNFTs() {
       let nfts;
       switch (supportedChains[chainID]?.chain) {
-        case "Algorand":
-          nfts = await fetchUserCreatedNfts(userId);
-          nfts = await getUserSingleNfts({ mainnet, singleNfts: nfts });
-          break;
-        case "Celo":
-          nfts = await getCeloMintedNFTs(address);
-          break;
-        case "Aurora":
-          nfts = await getAuroraMintedNfts(address);
-          break;
         case "Polygon":
           nfts = await getPolygonMintedNFTs(address);
           break;
-        case "Arbitrum":
-          nfts = await getArbitrumMintedNfts(address);
-          break;
         case "Avalanche":
           nfts = await getAvaxMintedNfts(address);
-          break;
-        case "Near":
-          nfts = await getNearMintedNfts(userId);
           break;
         default:
           break;
@@ -143,20 +126,8 @@ const Dashboard = () => {
       const collectedNFTs = await fetchUserBoughtNfts(userId);
 
       switch (supportedChains[chainID]?.chain) {
-        case "Algorand":
-          nfts = await getUserSingleNfts({ mainnet, singleNfts: collectedNFTs });
-          break;
-        case "Celo":
-          nfts = await getCeloCollectedNFTs(address);
-          break;
-        case "Aurora":
-          nfts = await getAuroraCollectedNFTs(address);
-          break;
         case "Polygon":
           nfts = await getPolygonCollectedNFTs(address);
-          break;
-        case "Arbitrum":
-          nfts = await getArbitrumCollectedNFTs(address);
           break;
         case "Avalanche":
           nfts = await getAvaxCollectedNFTs(address);
@@ -177,23 +148,11 @@ const Dashboard = () => {
       let collection;
       const collections = await fetchUserCollections(userId);
       switch (supportedChains[chainID]?.chain) {
-        case "Algorand":
-          collection = await getUserNftCollections({ collections, mainnet });
-          break;
-        case "Celo":
-          collection = await getCeloUserCollections(walletAddress);
-          break;
-        case "Aurora":
-          collection = await getAuroraUserCollections(walletAddress);
-          break;
         case "Polygon":
           collection = await getPolygonUserCollections(walletAddress);
           break;
         case "Avalanche":
           collection = await getAvaxUserCollections(walletAddress);
-          break;
-        case "Near":
-          collection = await getUserNearCollection(userId, mainnet);
           break;
         default:
           break;

@@ -26,7 +26,7 @@ const Chains = () => {
   };
 
   useEffect(() => {
-    const cardWidth = cardRef.current && cardRef.current.getBoundingClientRect().width;
+    const cardWidth = cardRef.current && cardRef.current.getBoundingClientRect();
     handleSetState({ cardWidth });
   }, []);
 

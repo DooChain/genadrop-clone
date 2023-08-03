@@ -14,12 +14,7 @@ import { filterBy, getCollectionsByChain, rangeBy, sortBy } from "../Marketplace
 import FilterDropdown from "../../components/Marketplace/Filter-dropdown/FilterDropdown";
 import Search from "../../components/Search/Search";
 import {
-  getAllAlgorandNfts,
-  getAllArbitrumNfts,
-  getAllAuroraNfts,
   getAllAvalancheNfts,
-  getAllCeloNfts,
-  getAllNearNfts,
   getAllPolygonNfts,
 } from "../../renderless/fetch-data/fetchUserGraphData";
 
@@ -85,13 +80,8 @@ const SingleNftCollection = () => {
 
   useEffect(() => {
     Promise.all([
-      getAllCeloNfts(),
-      getAllAuroraNfts(),
       getAllAvalancheNfts(),
-      getAllArbitrumNfts(),
       getAllPolygonNfts(),
-      getAllNearNfts(),
-      getAllAlgorandNfts(mainnet, dispatch),
     ]).then((data) =>
       handleSetState({
         collections: sortBy({ collections: data.flat(), value: "newest" }),

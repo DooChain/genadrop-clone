@@ -13,11 +13,7 @@ import { rangeBy, sortBy, getCollectionsByDate, getCollectionsByChain } from "..
 import NotFound from "../../components/not-found/notFound";
 import FilterDropdown from "../../components/Marketplace/Filter-dropdown/FilterDropdown";
 import Search from "../../components/Search/Search";
-import { getAllNearCollections } from "../../renderless/fetch-data/fetchNearCollectionData";
 import {
-  getAllAlgorandCollections,
-  getAllAuroraCollections,
-  getAllCeloCollections,
   getAllPolygonCollections,
 } from "../../renderless/fetch-data/fetchUserGraphData";
 
@@ -112,11 +108,7 @@ const Collections = () => {
 
   useEffect(() => {
     Promise.all([
-      getAllAuroraCollections(),
       getAllPolygonCollections(),
-      getAllNearCollections(mainnet),
-      getAllCeloCollections(),
-      getAllAlgorandCollections(mainnet, dispatch),
     ]).then((data) => {
       const filteredData = sortBy({ collections: data.flat(), value: "newest" });
       handleSetState({ collections: filteredData, filteredCollection: filteredData });

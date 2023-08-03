@@ -177,33 +177,8 @@ export const setAlgoCollections = (collections) => ({
   payload: collections,
 });
 
-export const setAuroraCollections = (collections) => ({
-  type: genActionTypes.SET_AURORA_COLLECTIONS,
-  payload: collections,
-});
-
-export const setCeloCollections = (collections) => ({
-  type: genActionTypes.SET_CELO_COLLECTIONS,
-  payload: collections,
-});
-
-export const setCeloSingleNft = (nfts) => ({
-  type: genActionTypes.SET_CELO_SINGLE_NFT,
-  payload: nfts,
-});
-
-export const setNearSingleNft = (nfts) => ({
-  type: genActionTypes.SET_NEAR_SINGLE_NFTS,
-  payload: nfts,
-});
-
 export const setAvaxSingleNfts = (nfts) => ({
   type: genActionTypes.SET_AVAX_SINGLE_NFTS,
-  payload: nfts,
-});
-
-export const setArbitrumNfts = (nfts) => ({
-  type: genActionTypes.SET_ARBITRUM_SINGLE_NFTS,
   payload: nfts,
 });
 
@@ -221,14 +196,8 @@ export const setSingleNfts = (nfts) => ({
   type: genActionTypes.SET_SINGLE_NFTS,
   payload: nfts,
 });
-
 export const setAlgoSingleNfts = (nfts) => ({
   type: genActionTypes.SET_ALGO_SINGLE_NFTS,
-  payload: nfts,
-});
-
-export const setAuroraSingleNfts = (nfts) => ({
-  type: genActionTypes.SET_AURORA_SINGLE_NFTS,
   payload: nfts,
 });
 

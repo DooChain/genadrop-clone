@@ -8,21 +8,12 @@ import { GenContext } from "../../gen-state/gen.context";
 import { setNotification } from "../../gen-state/gen.actions";
 import { getFormatedPrice } from "../../utils";
 import {
-  listAlgoNft,
-  listArbitrumNft,
-  listAuroraNft,
   listAvaxNft,
-  listCeloNft,
-  listNearMultipleMarkets,
   listPolygonNft,
 } from "../../utils/arc_ipfs";
 import { readUserProfile } from "../../utils/firebase";
 import {
-  arbitrumUserData,
-  auroraUserData,
   getAvalancheNft,
-  celoUserData,
-  nearUserData,
   polygonUserData,
 } from "../../renderless/fetch-data/fetchUserGraphData";
 import { ReactComponent as DropdownIcon } from "../../assets/icon-chevron-down.svg";
@@ -106,26 +97,8 @@ const List = () => {
     let listedNFT;
     if (supportedChains[chainId].chain === "Polygon") {
       listedNFT = await listPolygonNft(listProps);
-    } else if (supportedChains[chainId].chain === "Celo") {
-      listedNFT = await listCeloNft(listProps);
-    } else if (supportedChains[chainId].chain === "Aurora") {
-      listedNFT = await listAuroraNft(listProps);
     } else if (supportedChains[chainId].chain === "Avalanche") {
       listedNFT = await listAvaxNft(listProps);
-    } else if (supportedChains[chainId].chain === "Algorand") {
-      listedNFT = await listAlgoNft(listAlgoProps);
-    } else if (supportedChains[chainId].chain === "Arbitrum") {
-      listedNFT = await listArbitrumNft(listProps);
-    } else if (supportedChains[chainId].chain === "Near") {
-      if (!tpNearMarket && !fafNearMarket) {
-        return dispatch(
-          setNotification({
-            type: "warning",
-            message: "Please select a Near Marketplace",
-          })
-        );
-      }
-      return listNearMultipleMarkets(listNearProps);
     } else {
       return history.push(`${match.url}/listed`);
     }
@@ -159,34 +132,10 @@ const List = () => {
       if (supportedChains[chainId]?.chain === "Polygon") {
         const [nftData] = await polygonUserData(nftId);
         nft = nftData;
-      } else if (supportedChains[chainId]?.chain === "Celo") {
-        const [nftData] = await celoUserData(nftId);
-        nft = nftData;
-      } else if (supportedChains[chainId]?.chain === "Aurora") {
-        const [nftData] = await auroraUserData(nftId);
-        nft = nftData;
-      } else if (supportedChains[chainId]?.chain === "Near") {
-        const [nftData] = await nearUserData(nftId);
-        nft = nftData;
       } else if (supportedChains[chainId]?.chain === "Avalanche") {
         const [nftData] = await getAvalancheNft(nftId);
         nft = nftData;
-      } else if (supportedChains[chainId]?.chain === "Arbitrum") {
-        const [nftData] = await arbitrumUserData(nftId);
-        nft = nftData;
-      } else if (supportedChains[chainId]?.chain === "Algorand") {
-        const algoProps = {
-          singleAlgoNfts,
-          algoCollections,
-          activeCollection,
-          params,
-          mainnet,
-        };
-        if (activeCollection || supportedChains[params.chainId]?.chain === "Algorand") {
-          const algoNft = await getAlgoData({ algoProps });
-          nft = algoNft?.nftDetails;
-        }
-      }
+      } 
       if (nft === null) {
         return (
           dispatch(

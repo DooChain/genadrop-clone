@@ -7,9 +7,9 @@ import NotFound from "../../not-found/notFound";
 import GenadropCarouselScreen from "../../Genadrop-Carousel-Screen/GenadropCarouselScreen";
 import SingleNftCard from "../SingleNftCard/SingleNftCard";
 import {
-  getAllNearNfts,
   getFeaturedAvalancheNft,
   getFeaturedPolygonNfts,
+  getAllNearNfts,
 } from "../../../renderless/fetch-data/fetchUserGraphData";
 
 const FeautedNfts = () => {

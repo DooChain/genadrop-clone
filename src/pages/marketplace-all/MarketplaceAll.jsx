@@ -19,16 +19,8 @@ import FilterDropdown from "../../components/Marketplace/Filter-dropdown/FilterD
 import SingleNftCard from "../../components/Marketplace/SingleNftCard/SingleNftCard";
 import Search from "../../components/Search/Search";
 import {
-  getAllAlgorandCollections,
-  getAllAlgorandNfts,
-  getAllArbitrumNfts,
-  getAllAuroraCollections,
-  getAllAuroraNfts,
   getAllAvalancheNfts,
   getAllAvalancheCollections,
-  getAllCeloCollections,
-  getAllCeloNfts,
-  getAllNearNfts,
   getAllPolygonCollections,
   getAllPolygonNfts,
 } from "../../renderless/fetch-data/fetchUserGraphData";
@@ -67,18 +59,10 @@ const MarketplaceAll = () => {
 
   useEffect(() => {
     Promise.all([
-      getAllCeloNfts(),
-      getAllAuroraCollections(),
-      getAllAuroraNfts(),
       getAllAvalancheNfts(),
       getAllAvalancheCollections(),
       getAllPolygonCollections(),
-      getAllCeloCollections(),
       getAllPolygonNfts(),
-      getAllArbitrumNfts(),
-      getAllNearNfts(),
-      getAllAlgorandNfts(mainnet, dispatch),
-      getAllAlgorandCollections(mainnet, dispatch),
     ]).then((data) => {
       const filteredData = sortBy({ collections: data.flat(), value: "newest" });
       handleSetState({ collections: filteredData, filteredCollection: filteredData });

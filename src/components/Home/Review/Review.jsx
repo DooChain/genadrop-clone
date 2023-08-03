@@ -37,8 +37,8 @@ const Review = () => {
   };
 
   useEffect(() => {
+    if (process.env.REACT_APP_ENV_STAGING) return;
     axios
-
       .get(`https://cors-anywhere-wjlt.onrender.com/${twitterAPIURL(reviews)}`, {
         headers: {
           Authorization: `Bearer ${process.env.REACT_APP_TWITTER_ACCESS_TOKEN}`,
@@ -99,8 +99,8 @@ const Review = () => {
         <div className={classes.description}>See what people are saying about GenaDrop.</div>
         <div className={classes.display}>
           <div className={classes.row}>
-            {tweetsData.map((review) => (
-              <a key={review.id} href={review.url} target="_blank" rel="noreferrer">
+            {tweetsData.map((review, idx) => (
+              <a key={idx} href={review.url} target="_blank" rel="noreferrer">
                 <div className={classes.reviewCard}>
                   <div className={classes.review}>{formattedContent(review.text)} </div>
                   <div className={classes.profile}>

@@ -11,8 +11,6 @@ import { chainIdToParams } from "../../../utils/chainConnect";
 import { breakAddress, getDate } from "../../../components/wallet/wallet-script";
 import supportedChains from "../../../utils/supportedChains";
 import {
-  auroraCollectionTransactions,
-  celoCollectionTransactions,
   polygonCollectionTransactions,
 } from "../../../renderless/fetch-data/fetchUserGraphData";
 
@@ -41,12 +39,6 @@ const ExploreTransactionHistory = ({ collectionId, data, chain, fromCollection }
     (async function getTransactions() {
       let data = [];
       switch (supportedChains[chain]?.chain) {
-        case "Celo":
-          data = await celoCollectionTransactions(collectionId);
-          break;
-        case "Aurora":
-          data = await auroraCollectionTransactions(collectionId);
-          break;
         case "Polygon":
           data = await polygonCollectionTransactions(collectionId);
           break;

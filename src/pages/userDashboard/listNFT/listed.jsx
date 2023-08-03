@@ -8,10 +8,7 @@ import { GenContext } from "../../../gen-state/gen.context";
 import supportedChains from "../../../utils/supportedChains";
 // import { getUserBoughtNftCollection } from "../../../utils";
 import {
-  arbitrumUserData,
-  auroraUserData,
   getAvalancheNft,
-  celoUserData,
   polygonUserData,
 } from "../../../renderless/fetch-data/fetchUserGraphData";
 // import { fetchUserBoughtNfts } from "../../../utils/firebase";
@@ -19,10 +16,9 @@ import telegram from "../../../assets/blue-telegram.svg";
 import twitterIcon from "../../../assets/blue-twitter.svg";
 import facebookIcon from "../../../assets/blue-facebook.svg";
 import linktree from "../../../assets/linked-tree.svg";
-import { getAlgoData } from "../../NFT-Detail/NFTDetail-script";
 
 const Listed = () => {
-  const { mainnet, singleAlgoNfts, activeCollection, algoCollections } = useContext(GenContext);
+  const { mainnet, activeCollection } = useContext(GenContext);
 
   const {
     params: { nftId },
@@ -50,27 +46,6 @@ const Listed = () => {
             isLoading: false,
           });
         }
-      } else if (supportedChains[chainId]?.chain === "Celo") {
-        const [nft] = await celoUserData(nftId);
-        if (!nft) history.push("/");
-        handleSetState({
-          nftDetails: nft,
-          isLoading: false,
-        });
-      } else if (supportedChains[chainId]?.chain === "Aurora") {
-        const [nft] = await auroraUserData(nftId);
-        if (!nft) history.push("/");
-        handleSetState({
-          nftDetails: nft,
-          isLoading: false,
-        });
-      } else if (supportedChains[chainId]?.chain === "Arbitrum") {
-        const [nft] = await arbitrumUserData(nftId);
-        if (!nft) history.push("/");
-        handleSetState({
-          nftDetails: nft,
-          isLoading: false,
-        });
       } else if (supportedChains[chainId]?.chain === "Avalanche") {
         const [nft] = await getAvalancheNft(nftId);
         if (!nft) history.push("/");
@@ -78,22 +53,6 @@ const Listed = () => {
           nftDetails: nft,
           isLoading: false,
         });
-      } else if (supportedChains[chainId]?.chain === "Algorand") {
-        // const userNftCollections = await fetchUserBoughtNfts(account);
-        // const result = await getUserBoughtNftCollection(mainnet, userNftCollections);
-
-        // const nft = result.filter((NFT) => String(NFT.Id) === nftId)[0];
-        const algoProps = {
-          singleAlgoNfts,
-          algoCollections,
-          activeCollection,
-          params,
-          mainnet,
-        };
-        const algoNft = await getAlgoData({ algoProps });
-        const nft = algoNft?.nftDetails;
-        if (!nft) history.push("/");
-        handleSetState({ nftDetails: nft, isLoading: false });
       }
     })();
     document.documentElement.scrollTop = 0;

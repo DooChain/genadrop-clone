@@ -18,8 +18,6 @@ import { ReactComponent as TransferIcon, ReactComponent as ListIcon } from "../.
 import { ReactComponent as TransactionIcon } from "../../../assets/icon-transaction.svg";
 
 import {
-  auroraCollectionTransactions,
-  celoCollectionTransactions,
   polygonCollectionTransactions,
 } from "../../../renderless/fetch-data/fetchUserGraphData";
 import NotFound from "../../../components/not-found/notFound";
@@ -58,17 +56,8 @@ const ExploreTransactionHistory = ({ collectionId, chain }) => {
     (async function getTransactions() {
       let data = [];
       switch (supportedChains[chain]?.chain) {
-        case "Celo":
-          data = await celoCollectionTransactions(collectionId);
-          break;
-        case "Aurora":
-          data = await auroraCollectionTransactions(collectionId);
-          break;
         case "Polygon":
           data = await polygonCollectionTransactions(collectionId);
-          break;
-        case "Near":
-          data = await getCollectionTransactions(collectionId);
           break;
         default:
           handleSetState({ isAlgoChain: true });

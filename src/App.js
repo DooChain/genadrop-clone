@@ -104,41 +104,17 @@ function App() {
             <Route exact path="/brand" component={Brand} />
             <Route
               exact
-              path="/aurora"
-              component={() => {
-                window.location.replace("https://www.genadrop.com/marketplace/all?chain=Aurora");
-                return null;
-              }}
-            />
-            <Route
-              exact
-              path="/near"
-              component={() => {
-                window.location.replace("https://www.genadrop.com/marketplace/all?chain=Near");
-                return null;
-              }}
-            />
-            <Route
-              exact
-              path="/celo"
-              component={() => {
-                window.location.replace("https://www.genadrop.com/marketplace/all?chain=Celo");
-                return null;
-              }}
-            />
-            <Route
-              exact
-              path="/algorand"
-              component={() => {
-                window.location.replace("https://www.genadrop.com/marketplace/all?chain=Algorand");
-                return null;
-              }}
-            />
-            <Route
-              exact
               path="/polygon"
               component={() => {
                 window.location.replace("https://www.genadrop.com/marketplace/all?chain=Polygon");
+                return null;
+              }}
+            />
+            <Route
+              exact
+              path="/avalanche"
+              component={() => {
+                window.location.replace("https://www.genadrop.com/marketplace/all?chain=Avalanche");
                 return null;
               }}
             />

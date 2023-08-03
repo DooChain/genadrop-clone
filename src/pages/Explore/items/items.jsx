@@ -47,7 +47,7 @@ const Items = ({ handleSetState, state, collectionName }) => {
           headerHeight={headerHeight}
           NFTCollection={FilteredCollection}
           loadedChain={loadedChain}
-          chain={algoCollections[collectionName.trimEnd()]?.chain}
+          //chain={algoCollections[collectionName.trimEnd()]?.chain}
           toggleFilter={toggleFilter}
         />
       </main>

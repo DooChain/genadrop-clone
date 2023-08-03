@@ -12,19 +12,11 @@ import { getCollectionsByCategory, getCollectionsByChain, sortBy } from "../../.
 import { setActiveCollection } from "../../../gen-state/gen.actions";
 import NotFound from "../../not-found/notFound";
 import {
-  getAllAlgorandCollections,
-  getAllAlgorandNfts,
-  getAllArbitrumNfts,
-  getAllAuroraCollections,
-  getAllAuroraNfts,
   getAllAvalancheNfts,
-  getAllCeloCollections,
-  getAllCeloNfts,
-  getAllNearNfts,
+  getAllAvalancheCollections,
   getAllPolygonCollections,
   getAllPolygonNfts,
 } from "../../../renderless/fetch-data/fetchUserGraphData";
-import { getAllNearCollections } from "../../../renderless/fetch-data/fetchNearCollectionData";
 
 const AllNfts = () => {
   const history = useHistory();
@@ -101,28 +93,14 @@ const AllNfts = () => {
   };
 
   useEffect(() => {
-    Promise.all([
-      getAllAuroraCollections(),
-      getAllPolygonCollections(),
-      getAllNearCollections(mainnet),
-      getAllCeloCollections(),
-      getAllAlgorandCollections(mainnet, dispatch),
-    ]).then((data) => {
+    Promise.all([getAllPolygonCollections(), getAllAvalancheCollections()]).then((data) => {
       const filteredData = sortBy({ collections: data.flat(), value: "newest" });
       handleSetState({ collections: filteredData });
     });
   }, []);
 
   useEffect(() => {
-    Promise.all([
-      getAllCeloNfts(10),
-      getAllAuroraNfts(10),
-      getAllAvalancheNfts(10),
-      getAllArbitrumNfts(10),
-      getAllPolygonNfts(10),
-      getAllNearNfts(10),
-      getAllAlgorandNfts(mainnet, dispatch),
-    ]).then((data) => {
+    Promise.all([getAllAvalancheNfts(10), getAllPolygonNfts(10)]).then((data) => {
       handleSetState({ singles: sortBy({ collections: data.flat(), value: "newest" }) });
     });
   }, []);

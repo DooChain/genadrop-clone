@@ -35,14 +35,16 @@ const MediaBar = ({ MediaLogos }) => {
       }}
       extensions={{ AutoScroll }}
     >
-      {MediaLogos.map((logo) => (
-        <SplideSlide>
-          <div>
-            <a href={logo.url} target="_blank" rel="noreferrer" className={classes.slide} tabIndex="-1">
-              <img src={logo.srcActive} alt={logo.url} />
-            </a>
-          </div>
-        </SplideSlide>
+      {MediaLogos.map((logo, idx) => (
+        <div key={idx}>
+          <SplideSlide>
+            <div>
+              <a href={logo.url} target="_blank" rel="noreferrer" className={classes.slide} tabIndex="-1">
+                <img src={logo.srcActive} alt={logo.url} />
+              </a>
+            </div>
+          </SplideSlide>
+        </div>
       ))}
     </Splide>
   );

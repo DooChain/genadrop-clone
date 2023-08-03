@@ -13,16 +13,11 @@ import { setActiveCollection } from "../../gen-state/gen.actions";
 import { filterBy, sortBy } from "../Marketplace/Marketplace-script";
 import Items from "./items/items";
 import ExploreTransactionHistory from "./exploreTransactionHistory/exploreTransactionHistory";
-import { getNearCollection } from "../../renderless/fetch-data/fetchNearCollectionData";
 import supportedChains from "../../utils/supportedChains";
 import {
-  getAllAlgorandCollections,
-  getAuroraSingleCollection,
   getAvalancheSingleCollection,
-  getCeloSingleCollection,
   getPolygonSingleCollection,
 } from "../../renderless/fetch-data/fetchUserGraphData";
-import { fetchAlgoCollections } from "../../utils/firebase";
 
 const Explore = () => {
   const [state, setState] = useState({
@@ -61,7 +56,7 @@ const Explore = () => {
   };
 
   const getAllCollectionChains = async () => {
-    const result = await getNearCollection(collectionName, mainnet);
+    const result = [];
     if (result.length) {
       return result;
     }
