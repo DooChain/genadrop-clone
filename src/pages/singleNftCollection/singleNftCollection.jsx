@@ -13,10 +13,7 @@ import { filterBy, getCollectionsByChain, rangeBy, sortBy } from "../Marketplace
 
 import FilterDropdown from "../../components/Marketplace/Filter-dropdown/FilterDropdown";
 import Search from "../../components/Search/Search";
-import {
-  getAllAvalancheNfts,
-  getAllPolygonNfts,
-} from "../../renderless/fetch-data/fetchUserGraphData";
+import { getAllNftsbyChain } from "../../renderless/fetch-data/fetchUserGraphData";
 
 const SingleNftCollection = () => {
   const { mainnet, account, dispatch } = useContext(GenContext);
@@ -79,10 +76,7 @@ const SingleNftCollection = () => {
   };
 
   useEffect(() => {
-    Promise.all([
-      getAllAvalancheNfts(),
-      getAllPolygonNfts(),
-    ]).then((data) =>
+    Promise.all([getAllNftsbyChain(0, "Avalanche"), getAllNftsbyChain(0, "Polygon")]).then((data) =>
       handleSetState({
         collections: sortBy({ collections: data.flat(), value: "newest" }),
         filteredCollection: sortBy({ collections: data.flat(), value: "newest" }),

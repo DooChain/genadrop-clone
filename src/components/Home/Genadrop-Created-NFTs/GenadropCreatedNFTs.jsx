@@ -6,7 +6,7 @@ import { Link, useHistory } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import classes from "./GenadropCreatedNFTs.module.css";
 import { GenContext } from "../../../gen-state/gen.context";
-import { getFeaturedAvalancheNft, nearFeaturedNfts } from "../../../renderless/fetch-data/fetchUserGraphData";
+import { getFeaturedChainNft } from "../../../renderless/fetch-data/fetchUserGraphData";
 
 const GenadropCreatedNFTs = () => {
   const cardRef = useRef(null);
@@ -39,16 +39,16 @@ const GenadropCreatedNFTs = () => {
         "0x5ce2deee9b495b5db2996c81c16005559393efb8238140",
       ];
       Promise.all([
-        getFeaturedAvalancheNft(goodIds[1]),
-        getFeaturedAvalancheNft(goodIds[2]),
-        getFeaturedAvalancheNft(goodIds[3]),
+        getFeaturedChainNft(goodIds[1], "Avalanche"),
+        getFeaturedChainNft(goodIds[2], "Avalanche"),
+        getFeaturedChainNft(goodIds[3], "Avalanche"),
       ]).then((data) => {
         handleSetState({ singles: [...data.flat()] });
       });
     } else {
-      Promise.all([nearFeaturedNfts("genadrop-test.mpadev.testnet1663492551707")]).then((data) => {
-        handleSetState({ singles: [...data.flat()] });
-      });
+      // Promise.all([nearFeaturedNfts("genadrop-test.mpadev.testnet1663492551707")]).then((data) => {
+      //   handleSetState({ singles: [...data.flat()] });
+      // });
     }
   }, []);
 

@@ -3,45 +3,9 @@
 /* eslint-disable consistent-return */
 import { readNftTransaction, readUserProfile } from "../../utils/firebase";
 import { getCeloGraphNft, getGraphCollection, getNearNftDetailTransaction, getTransactions } from "../../utils";
-import {
-  getAvalancheNft,
-  polygonUserData,
-  getAllPolygonNfts,
-  getAllAvalancheNfts,
-  getPolygonSingleCollection,
-  getAvalancheSingleCollection,
-} from "../../renderless/fetch-data/fetchUserGraphData";
+import { getNftById, getAllNftsbyChain, getSingleCollection } from "../../renderless/fetch-data/fetchUserGraphData";
 import supportedChains from "../../utils/supportedChains";
 import { getCollectionNft } from "../../renderless/fetch-data/fetchNearCollectionData";
-
-export const getAlgoData = async ({ algoProps }) => {
-  const { singleAlgoNfts, activeCollection, params, algoCollections } = algoProps;
-  const { collectionName, nftId } = params;
-  let nftDetails;
-  if (collectionName) {
-    if (activeCollection) {
-      nftDetails = activeCollection.find((col) => col.Id === Number(nftId));
-    } else {
-      nftDetails = algoCollections[nftId];
-    }
-  } else {
-    nftDetails = singleAlgoNfts[nftId];
-  }
-  let transactionHistory;
-  if (nftDetails) {
-    transactionHistory = await readNftTransaction(nftDetails.Id);
-  }
-  // tHistory.find((t) => {
-  //   if (t.type === "Minting") t.price = nftDetails.price;
-  // });
-
-  return {
-    nftDetails,
-    transactionHistory,
-    _1of1: singleAlgoNfts || [],
-    collection: activeCollection || [],
-  };
-};
 
 export const getGraphData = async ({ graphProps }) => {
   const {
@@ -70,17 +34,11 @@ export const getGraphData = async ({ graphProps }) => {
       let nft = {};
       let transactionHistory = [];
       let collection = [];
-      if (supportedChains[collectionChain]?.chain === "Polygon") {
-        const [nftsData, _] = await getPolygonSingleCollection(collectionId);
-        nft = nftsData.find((key) => key.Id === nftId);
-        collection = nftsData;
-        transactionHistory = await getTransactions(nft.transactions);
-      } else if (supportedChains[collectionChain]?.chain === "Avalanche") {
-        const [nftsData, _] = await getAvalancheSingleCollection(collectionId);
-        nft = nftsData.find((key) => key.Id === nftId);
-        collection = nftsData;
-        transactionHistory = await getTransactions(nft.transactions);
-      }
+
+      const [nftsData, _] = await getSingleCollection(collectionId, supportedChains[collectionChain]?.chain);
+      nft = nftsData.find((key) => key.Id === nftId);
+      collection = nftsData;
+      transactionHistory = await getTransactions(nft.transactions);
 
       return {
         nftDetails: nft,
@@ -115,26 +73,14 @@ export const getGraphData = async ({ graphProps }) => {
   } else {
     try {
       // Fetching for nft by Id comparing it to the chain it belongs to before displaying the Id
-      if (supportedChains[Number(chainId)]?.chain === "Polygon") {
-        const [polygonData, trHistory] = await polygonUserData(nftId);
-        const polygonNfts = await getAllPolygonNfts(10);
-        return {
-          nftDetails: polygonData,
-          collection: [],
-          transactionHistory: trHistory,
-          _1of1: polygonNfts,
-        };
-      }
-      if (supportedChains[Number(chainId)]?.chain === "Avalanche") {
-        const [avaxData, trHistory] = await getAvalancheNft(nftId);
-        const avalancheNfts = await getAllAvalancheNfts(10);
-        return {
-          nftDetails: avaxData,
-          collection: [],
-          transactionHistory: trHistory,
-          _1of1: avalancheNfts,
-        };
-      }
+      const [nftData, trHistory] = await getNftById(nftId, supportedChains[Number(chainId)]?.chain);
+      const nfts = await getAllNftsbyChain(10, supportedChains[Number(chainId)]?.chain);
+      return {
+        nftDetails: nftData,
+        collection: [],
+        transactionHistory: trHistory,
+        _1of1: nfts,
+      };
     } catch (error) {
       console.log({ error });
     }

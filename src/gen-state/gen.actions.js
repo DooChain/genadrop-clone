@@ -177,14 +177,19 @@ export const setAlgoCollections = (collections) => ({
   payload: collections,
 });
 
-export const setAvaxSingleNfts = (nfts) => ({
-  type: genActionTypes.SET_AVAX_SINGLE_NFTS,
+export const setAvalancheSingleNfts = (nfts) => ({
+  type: genActionTypes.SET_AVALANCHE_SINGLE_NFTS,
   payload: nfts,
 });
 
 export const setAllNfts = (nfts) => ({
   type: genActionTypes.SET_ALL_NFTS,
   payload: nfts,
+});
+
+export const setAvalancheCollections = (collections) => ({
+  type: genActionTypes.SET_AVALANCHE_COLLECTIONS,
+  payload: collections,
 });
 
 export const setPolygonCollections = (collections) => ({

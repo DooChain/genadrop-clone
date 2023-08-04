@@ -9,7 +9,7 @@ import Details from "./Details/Details";
 import Metadata from "./Metadata/Metadata";
 import More from "./More/More";
 import NFT from "./NFT/NFT";
-import { getAlgoData, getGraphData } from "./NFTDetail-script";
+import { getGraphData } from "./NFTDetail-script";
 import classes from "./NFTDetail.module.css";
 import PriceHistory from "./PriceHistory/PriceHistory";
 import TransactionHistory from "./TransactionHistory/TransactionHistory";
@@ -58,12 +58,7 @@ const NFTDetail = () => {
   const getData = useCallback(async () => {
     document.documentElement.scrollTop = 0;
 
-    let result;
-    if (activeCollection || supportedChains[params.chainId]?.chain === "Algorand") {
-      result = await getAlgoData({ algoProps });
-    } else {
-      result = await getGraphData({ graphProps });
-    }
+    let result = await getGraphData({ graphProps });
     handleSetState({ ...result });
   }, []);
 

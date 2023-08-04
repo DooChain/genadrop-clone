@@ -33,15 +33,6 @@ export const chainIdToParams = {
     blockExplorerUrls: ["https://snowtrace.io/"],
     iconUrls: [""],
   },
-
-  1313161555: {
-    chainId: "0X4E454153",
-    chainName: "Aurora Testnet",
-    nativeCurrency: { name: "Aurora", symbol: "ETH", decimals: 18 },
-    rpcUrls: ["https://testnet.aurora.dev/"],
-    blockExplorerUrls: ["https://testnet.aurorascan.dev/"],
-    iconUrls: [""],
-  },
 };
 
 const chainDecimalsToHex = {

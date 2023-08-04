@@ -14,10 +14,7 @@ import { filterBy, sortBy } from "../Marketplace/Marketplace-script";
 import Items from "./items/items";
 import ExploreTransactionHistory from "./exploreTransactionHistory/exploreTransactionHistory";
 import supportedChains from "../../utils/supportedChains";
-import {
-  getAvalancheSingleCollection,
-  getPolygonSingleCollection,
-} from "../../renderless/fetch-data/fetchUserGraphData";
+import { getSingleCollection } from "../../renderless/fetch-data/fetchUserGraphData";
 
 const Explore = () => {
   const [state, setState] = useState({
@@ -66,32 +63,9 @@ const Explore = () => {
       let collectionData = [];
       const chainId = collectionName.split("~")[0];
       const splitCollectionId = collectionName.split("~")[1];
-      if (supportedChains[chainId]?.chain === "Polygon") {
-        [nftData, collectionData] = await getPolygonSingleCollection(splitCollectionId);
-      } else if (supportedChains[chainId]?.chain === "Avalanche") {
-        [nftData, collectionData] = await getAvalancheSingleCollection(splitCollectionId);
-      } else if (supportedChains[chainId]?.chain === "Celo") {
-        [nftData, collectionData] = await getCeloSingleCollection(splitCollectionId);
-      } else if (supportedChains[chainId]?.chain === "Aurora") {
-        [nftData, collectionData] = await getAuroraSingleCollection(splitCollectionId);
-      } else {
-        const fetchAlgorandCollections = await getAllAlgorandCollections(mainnet, dispatch);
-        if (fetchAlgorandCollections) {
-          const singleAlgorandCollection = fetchAlgorandCollections.filter((data) => data?.name === collectionName)[0];
-          const res = await getNftCollection({
-            collection: singleAlgorandCollection,
-            mainnet,
-          });
-          const { NFTCollection } = res;
-          handleSetState({
-            NFTCollection,
-            loadedChain: singleAlgorandCollection.chain,
-            collection: singleAlgorandCollection,
-          });
-          dispatch(setActiveCollection(NFTCollection));
-          return fetchAlgoCollections;
-        }
-      }
+
+      [nftData, collectionData] = await getSingleCollection(splitCollectionId, supportedChains[chainId]?.chain);
+
       handleSetState({
         collection: {
           ...collectionData,

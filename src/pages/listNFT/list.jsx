@@ -7,17 +7,10 @@ import supportedChains from "../../utils/supportedChains";
 import { GenContext } from "../../gen-state/gen.context";
 import { setNotification } from "../../gen-state/gen.actions";
 import { getFormatedPrice } from "../../utils";
-import {
-  listAvaxNft,
-  listPolygonNft,
-} from "../../utils/arc_ipfs";
+import { listNetworkNft, listAvaxNft, listPolygonNft } from "../../utils/arc_ipfs";
 import { readUserProfile } from "../../utils/firebase";
-import {
-  getAvalancheNft,
-  polygonUserData,
-} from "../../renderless/fetch-data/fetchUserGraphData";
+import { getNftById } from "../../renderless/fetch-data/fetchUserGraphData";
 import { ReactComponent as DropdownIcon } from "../../assets/icon-chevron-down.svg";
-import { getAlgoData } from "../NFT-Detail/NFTDetail-script";
 
 // icons
 import tradePortIcon from "../../assets/tradeport.jpg";
@@ -95,11 +88,9 @@ const List = () => {
       id: nftDetails.tokenID,
     };
     let listedNFT;
-    if (supportedChains[chainId].chain === "Polygon") {
-      listedNFT = await listPolygonNft(listProps);
-    } else if (supportedChains[chainId].chain === "Avalanche") {
-      listedNFT = await listAvaxNft(listProps);
-    } else {
+    if (supportedChains[chainId].chain === "Polygon" || supportedChains[chainId].chain === "Avalanche")
+      listedNFT = await listNetworkNft(listProps, supportedChains[chainId].chain);
+    else {
       return history.push(`${match.url}/listed`);
     }
     if (listedNFT.error) {
@@ -128,14 +119,7 @@ const List = () => {
 
   useEffect(() => {
     (async function getUserCollection() {
-      let nft;
-      if (supportedChains[chainId]?.chain === "Polygon") {
-        const [nftData] = await polygonUserData(nftId);
-        nft = nftData;
-      } else if (supportedChains[chainId]?.chain === "Avalanche") {
-        const [nftData] = await getAvalancheNft(nftId);
-        nft = nftData;
-      } 
+      const [nft] = await getNftById(nftId, supportedChains[chainId]?.chain);
       if (nft === null) {
         return (
           dispatch(

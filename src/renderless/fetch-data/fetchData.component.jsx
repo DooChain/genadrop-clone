@@ -6,34 +6,17 @@ import {
   setCollections,
   setSingleNfts,
   setPolygonCollections,
-  setPolygonSingleNfts,
+  setAvalancheCollections,
   setNotification,
   setSearchContainer,
-  setAvaxSingleNfts,
+  setPolygonSingleNfts,
+  setAvalancheSingleNfts,
 } from "../../gen-state/gen.actions";
-import {
-  getGraphCollections,
-  getNftCollections,
-  getSingleNfts,
-  getSingleGraphNfts,
-} from "../../utils";
-import {
-  GET_GRAPH_COLLECTIONS,
-  GET_ALL_POLYGON_COLLECTIONS,
-  GET_POLYGON_SINGLE_NFTS,
-  GET_POLYGON_SOUL_BOUND_NFTS,
-  GET_AVAX_SINGLE_NFTS,
-} from "../../graphql/querries/getCollections";
-import {
-  avalancheClient,
-  polygonClient,
-} from "../../utils/graphqlClient";
+import { getGraphCollections, getNftCollections, getSingleNfts, getSingleGraphNfts } from "../../utils";
+import { GET_GRAPH_COLLECTIONS, GET_SIGNLE_NFTS } from "../../graphql/querries/getCollections";
+import { avalancheClient, polygonClient } from "../../utils/graphqlClient";
 import { GenContext } from "../../gen-state/gen.context";
-import {
-  parseAvaxSingle,
-  parsePolygonCollection,
-  parsePolygonSingle,
-} from "./fetchData-script";
+import { parseAvaxSingle, parsePolygonCollection, parsePolygonSingle } from "./fetchData-script";
 
 const FetchData = () => {
   const { dispatch, mainnet } = useContext(GenContext);
@@ -42,7 +25,7 @@ const FetchData = () => {
     (async function getPolygonCollections() {
       dispatch(setPolygonCollections(null));
 
-      const { data, error } = await polygonClient.query(GET_ALL_POLYGON_COLLECTIONS).toPromise();
+      const { data, error } = await polygonClient.query(GET_GRAPH_COLLECTIONS).toPromise();
       if (error) {
         return dispatch(
           setNotification({
@@ -74,8 +57,10 @@ const FetchData = () => {
     (async function getPolygonSingleNfts() {
       dispatch(setPolygonSingleNfts(null));
 
-      const { data, error } = await polygonClient.query(GET_POLYGON_SINGLE_NFTS).toPromise();
-      const { data: sbData, error: sbError } = await polygonClient.query(GET_POLYGON_SOUL_BOUND_NFTS).toPromise();
+      const { data, error } = await polygonClient.query(GET_SIGNLE_NFTS("Polygon", 0, false)).toPromise();
+      const { data: sbData, error: sbError } = await polygonClient
+        .query(GET_SIGNLE_NFTS("Polygon", 0, true))
+        .toPromise();
       if (error || sbError) {
         return dispatch(
           setNotification({
@@ -98,11 +83,43 @@ const FetchData = () => {
       return null;
     })();
 
+    // Get Avalanche Collections
+    (async function getAvalancheCollections() {
+      dispatch(setAvalancheCollections(null));
+
+      const { data, error } = await avalancheClient.query(GET_GRAPH_COLLECTIONS).toPromise();
+      if (error) {
+        return dispatch(
+          setNotification({
+            message: error.message,
+            type: "warning",
+          })
+        );
+      }
+      const result = await getGraphCollections(data?.collections);
+      const filterAddress =
+        process.env.REACT_APP_ENV_STAGING === "true"
+          ? ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS)
+          : ethers.utils.hexlify(process.env.REACT_APP_AVAX_MAINNET_SINGLE_ADDRESS);
+      const res = result?.filter((data) => data?.Id !== filterAddress);
+      if (res?.length) {
+        // dispatch(setPolygonCollections(res));
+        dispatch(
+          setSearchContainer({
+            "Polygon collection": parsePolygonCollection(res),
+          })
+        );
+      } else {
+        dispatch(setPolygonCollections(null));
+      }
+      return null;
+    })();
+
     // Avalanche Single Nfts
     (async function getAvalancheSingleNfts() {
-      dispatch(setAvaxSingleNfts(null));
+      dispatch(setAvalancheSingleNfts(null));
 
-      const { data, error } = await avalancheClient.query(GET_AVAX_SINGLE_NFTS).toPromise();
+      const { data, error } = await avalancheClient.query(GET_SIGNLE_NFTS("Avalanche", 0, false)).toPromise();
       if (error) {
         return dispatch(
           setNotification({

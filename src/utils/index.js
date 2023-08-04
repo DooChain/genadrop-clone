@@ -107,85 +107,13 @@ function fetchCollection(collection, mainnet) {
   });
 }
 
-export const fetchNearCollection = async (nfts, collection) => {
-  const nftArr = [];
-  if (nfts) {
-    for (let i = 0; i < nfts?.length; i++) {
-      const { data } = await axios.get(nfts[i].tokenIPFSPath.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/"));
-      try {
-        const nftObj = {};
-        nftObj.collection_name = collection?.name;
-        nftObj.description = collection?.description;
-        nftObj.chain = nfts[i].chain;
-        nftObj.owner = nfts[i]?.owner;
-        nftObj.Id = nfts[i].id;
-        nftObj.price = nfts[i].price ? utils.format.formatNearAmount(nfts[i].price) : 0;
-        nftObj.sold = nfts[i].isSold;
-        nftObj.nfts = nfts;
-        nftObj.ipfs_data = data;
-        nftObj.name = collection?.name;
-        nftObj.transactions = nfts[i]?.Transactions;
-        nftObj.image_url = data.image.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
-        nftArr.push(nftObj);
-        window.localStorage.activeCollection = JSON.stringify({ ...nftObj });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  }
-
-  return nftArr;
-};
-
-export const getNearCollections = async (collections) => {
-  function fetchNearCollection(collection) {
-    const fetch = async (resolve, reject) => {
-      try {
-        const collectionObj = {};
-        const { data } = await axios.get(
-          collection?.Nfts[0]?.tokenIPFSPath.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/")
-        );
-        collectionObj.image_url = data?.image.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
-        const getPrice = collection?.Nfts.map((col) => col.price).reduce((a, b) => (a < b ? a : b));
-        collectionObj.price = getPrice ? utils.format.formatNearAmount(getPrice.toString()) : 0;
-        collectionObj.name = collection?.name;
-        collectionObj.owner = collection?.creator;
-        collectionObj.Id = collection?.id;
-        collectionObj.chain = collection?.Nfts[0]?.chain;
-        collectionObj.nfts = collection?.Nfts;
-        collectionObj.description = collection?.description;
-        const newDate = moment(collection?.created_at).format();
-        collectionObj.createdAt = new Date(newDate);
-        collectionObj.transactions = collection?.Nfts.Transactions;
-        resolve(collectionObj);
-      } catch (error) {
-        console.log("near collection error", error);
-        reject(error);
-      }
-    };
-    return new Promise((resolve, reject) => {
-      fetch(resolve, reject);
-    });
-  }
-  const collectionArr = [];
-  if (collections) {
-    const responses = await Promise.allSettled(collections.map((collection) => fetchNearCollection(collection)));
-    responses.forEach((element) => {
-      if (element?.status === "fulfilled") {
-        collectionArr.push(element.value);
-      }
-    });
-  }
-  return collectionArr;
-};
-
 export const getGraphCollections = async (collections) => {
   function fetchAuroraCollection(collection) {
     const fetch = async (resolve, reject) => {
       try {
         const collectionObj = {};
         const { data } = await axios.get(
-          collection?.nfts[0].tokenIPFSPath.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/")
+          collection?.nfts[0]?.tokenIPFSPath.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/")
         );
         collectionObj.image_url = data?.image.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
 
@@ -201,46 +129,6 @@ export const getGraphCollections = async (collections) => {
         collectionObj.nfts = collection?.nfts;
         collectionObj.createdAt = new Date(Number(collection?.nfts?.[0].createdAtTimestamp) * 1000);
         collectionObj.transactions = collection?.nfts?.transactions;
-        resolve(collectionObj);
-      } catch (err) {
-        console.log(err);
-        reject(err);
-      }
-    };
-    return new Promise((resolve, reject) => {
-      fetch(resolve, reject);
-    });
-  }
-  const collectionsArr = [];
-  if (collections) {
-    const responses = await Promise.allSettled(collections.map((collection) => fetchAuroraCollection(collection)));
-    responses.forEach((element) => {
-      if (element?.status === "fulfilled") {
-        collectionsArr.push(element.value);
-      }
-    });
-  }
-  return collectionsArr;
-};
-
-export const getCeloGraphCollections = async (collections) => {
-  function fetchAuroraCollection(collection) {
-    const fetch = async (resolve, reject) => {
-      try {
-        const collectionObj = {};
-        const { data } = await axios.get(
-          collection?.nfts[0].tokenIPFSPath.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/")
-        );
-        collectionObj.image_url = data?.image.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
-
-        collectionObj.name = collection?.name;
-        collectionObj.owner = collection?.id;
-        const getPrice = collection?.nfts.map((col) => col.price).reduce((a, b) => (a < b ? a : b));
-        const chain = collection?.nfts?.map((col) => col.chain).reduce((a, b) => a === b && a);
-        collectionObj.chain = chain;
-        collectionObj.price = getPrice;
-        collectionObj.description = collection?.description;
-        collectionObj.nfts = collection?.nfts;
         resolve(collectionObj);
       } catch (err) {
         console.log(err);

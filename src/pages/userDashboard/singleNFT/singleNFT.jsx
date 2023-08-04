@@ -24,8 +24,8 @@ import supportedChains from "../../../utils/supportedChains";
 import {
   auroraUserData,
   celoUserData,
+  getNftById,
   nearUserData,
-  polygonUserData,
 } from "../../../renderless/fetch-data/fetchUserGraphData";
 
 const ListSingleNFT = (nft) => {
@@ -135,39 +135,14 @@ const ListSingleNFT = (nft) => {
       try {
         // Fetching for nft by Id comparing it to the chain it belongs to before displaying the Id
 
-        if (supportedChains[Number(nftChainId)].chain === "Polygon") {
-          const [polygonData, trHistory] = await polygonUserData(nftId);
-          if (!polygonData) return history.goBack();
-          handleSetState({
-            nftDetails: polygonData,
-            isLoading: false,
-            transactionHistory: trHistory,
-          });
-        } else if (supportedChains[Number(nftChainId)].chain === "Aurora") {
-          const [auroraData, trHistory] = await auroraUserData(nftId);
-          if (!auroraData) return history.goBack();
-          handleSetState({
-            nftDetails: auroraData,
-            isLoading: false,
-            transactionHistory: trHistory,
-          });
-        } else if (supportedChains[Number(nftChainId)].chain === "Celo") {
-          const [celoData, trHistory] = await celoUserData(nftId);
-          if (!celoData) return history.goBack();
-          handleSetState({
-            nftDetails: celoData,
-            isLoading: false,
-            transactionHistory: trHistory,
-          });
-        } else if (supportedChains[Number(nftChainId)].chain === "Near") {
-          const [nearData, trHistory] = await nearUserData(nftId);
-          if (!nearData) return history.goBack();
-          handleSetState({
-            nftDetails: nearData,
-            isLoading: false,
-            transactionHistory: trHistory,
-          });
-        }
+        const [nftData, trHistory] = await getNftById(nftId, supportedChains[Number(nftChainId)].chain);
+
+        if (!nftData) return history.goBack();
+        handleSetState({
+          nftDetails: nftData,
+          isLoading: false,
+          transactionHistory: trHistory,
+        });
       } catch (error) {
         console.log({ error });
       }

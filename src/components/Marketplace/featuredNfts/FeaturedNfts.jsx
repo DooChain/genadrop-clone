@@ -6,11 +6,7 @@ import { GenContext } from "../../../gen-state/gen.context";
 import NotFound from "../../not-found/notFound";
 import GenadropCarouselScreen from "../../Genadrop-Carousel-Screen/GenadropCarouselScreen";
 import SingleNftCard from "../SingleNftCard/SingleNftCard";
-import {
-  getFeaturedAvalancheNft,
-  getFeaturedPolygonNfts,
-  getAllNearNfts,
-} from "../../../renderless/fetch-data/fetchUserGraphData";
+import { getFeaturedChainNft, getAllNftsbyChain } from "../../../renderless/fetch-data/fetchUserGraphData";
 
 const FeautedNfts = () => {
   const { mainnet } = useContext(GenContext);
@@ -40,16 +36,16 @@ const FeautedNfts = () => {
   useEffect(() => {
     if (mainnet) {
       Promise.all([
-        getFeaturedAvalancheNft(featuredNFTs[1]),
-        getFeaturedAvalancheNft(featuredNFTs[3]),
-        getFeaturedAvalancheNft(featuredNFTs[4]),
-        getFeaturedAvalancheNft(featuredNFTs[5]),
-        getFeaturedPolygonNfts(featuredNFTs[6]),
+        getFeaturedChainNft(featuredNFTs[1], "Avalanche"),
+        getFeaturedChainNft(featuredNFTs[3], "Avalanche"),
+        getFeaturedChainNft(featuredNFTs[4], "Avalanche"),
+        getFeaturedChainNft(featuredNFTs[5], "Avalanche"),
+        getFeaturedPolygonNfts(featuredNFTs[6], "Avalanche"),
       ]).then((data) => {
         handleSetState({ NFTs: [...data.flat()] });
       });
     } else {
-      Promise.all([getAllNearNfts(10)]).then((data) => {
+      Promise.all([getAllNftsbyChain(10, "Avalanche")]).then((data) => {
         handleSetState({ NFTs: [...data.flat()] });
       });
     }

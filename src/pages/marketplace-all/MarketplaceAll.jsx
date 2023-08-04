@@ -18,12 +18,7 @@ import NotFound from "../../components/not-found/notFound";
 import FilterDropdown from "../../components/Marketplace/Filter-dropdown/FilterDropdown";
 import SingleNftCard from "../../components/Marketplace/SingleNftCard/SingleNftCard";
 import Search from "../../components/Search/Search";
-import {
-  getAllAvalancheNfts,
-  getAllAvalancheCollections,
-  getAllPolygonCollections,
-  getAllPolygonNfts,
-} from "../../renderless/fetch-data/fetchUserGraphData";
+import { getAllChainCollections, getAllNftsbyChain } from "../../renderless/fetch-data/fetchUserGraphData";
 
 const MarketplaceAll = () => {
   const { mainnet, dispatch } = useContext(GenContext);
@@ -59,10 +54,10 @@ const MarketplaceAll = () => {
 
   useEffect(() => {
     Promise.all([
-      getAllAvalancheNfts(),
-      getAllAvalancheCollections(),
-      getAllPolygonCollections(),
-      getAllPolygonNfts(),
+      getAllNftsbyChain(0, "Avalanche"),
+      getAllNftsbyChain(0, "Polygon"),
+      getAllChainCollections("Avalanche"),
+      getAllChainCollections("Polygon"),
     ]).then((data) => {
       const filteredData = sortBy({ collections: data.flat(), value: "newest" });
       handleSetState({ collections: filteredData, filteredCollection: filteredData });

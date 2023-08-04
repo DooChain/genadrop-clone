@@ -23,6 +23,8 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
  *
  * _Available since v3.1._
  */
+
+//FIXME: change this as well
 contract SingleNftMinter is
     UUPSUpgradeable,
     ContextUpgradeable,
@@ -32,6 +34,7 @@ contract SingleNftMinter is
     IERC1155MetadataURIUpgradeable
 {
     using CountersUpgradeable for CountersUpgradeable.Counter;
+    // FIXME: change this to uint256
     CountersUpgradeable.Counter private supply;
 
     using AddressUpgradeable for address;

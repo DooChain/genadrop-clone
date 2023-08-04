@@ -14,15 +14,14 @@ import {
   getAuroraMintedNfts,
   getAuroraUserCollections,
   getAvaxCollectedNFTs,
-  getAvaxMintedNfts,
   getAvaxUserCollections,
   getCeloCollectedNFTs,
   getCeloMintedNFTs,
   getCeloUserCollections,
   getNearMintedNfts,
-  getPolygonCollectedNFTs,
-  getPolygonMintedNFTs,
-  getPolygonUserCollections,
+  getChainCollectedNFTs,
+  getChainMintedNFTs,
+  getChainUserCollections,
 } from "../../renderless/fetch-data/fetchUserGraphData";
 // utils
 import { getUserNftCollections, getUserSingleNfts } from "../../utils";
@@ -101,17 +100,7 @@ const Dashboard = () => {
       address = ethers?.utils?.hexlify(userId);
     }
     (async function getUserNFTs() {
-      let nfts;
-      switch (supportedChains[chainID]?.chain) {
-        case "Polygon":
-          nfts = await getPolygonMintedNFTs(address);
-          break;
-        case "Avalanche":
-          nfts = await getAvaxMintedNfts(address);
-          break;
-        default:
-          break;
-      }
+      const nfts = await getChainMintedNFTs(address, supportedChains[chainID]?.chain);
       const onSaleNFTs = nfts?.filter((nft) => nft.price !== 0 && !nft.sold);
 
       handleSetState({
@@ -122,19 +111,8 @@ const Dashboard = () => {
     })();
     (async function getUserCollectedNfts() {
       // get collected nfts from the same fetch result
-      let nfts;
       const collectedNFTs = await fetchUserBoughtNfts(userId);
-
-      switch (supportedChains[chainID]?.chain) {
-        case "Polygon":
-          nfts = await getPolygonCollectedNFTs(address);
-          break;
-        case "Avalanche":
-          nfts = await getAvaxCollectedNFTs(address);
-          break;
-        default:
-          break;
-      }
+      const nfts = await getChainCollectedNFTs(address, supportedChains[chainID]?.chain);
       handleSetState({ collectedNfts: [...(nfts || [])], loading: false });
     })();
 
@@ -145,18 +123,8 @@ const Dashboard = () => {
       if (supportedChains[chainID]?.chain !== "Algorand" && supportedChains[chainID]?.chain !== "Near" && userId) {
         walletAddress = ethers?.utils?.hexlify(userId);
       }
-      let collection;
       const collections = await fetchUserCollections(userId);
-      switch (supportedChains[chainID]?.chain) {
-        case "Polygon":
-          collection = await getPolygonUserCollections(walletAddress);
-          break;
-        case "Avalanche":
-          collection = await getAvaxUserCollections(walletAddress);
-          break;
-        default:
-          break;
-      }
+      const collection = await getChainUserCollections(walletAddress, supportedChains[chainID]?.chain);
       handleSetState({
         myCollections: [...(collection || [])],
         loading: false,

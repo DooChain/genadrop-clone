@@ -10,9 +10,7 @@ import { chainIdToParams } from "../../../utils/chainConnect";
 
 import { breakAddress, getDate } from "../../../components/wallet/wallet-script";
 import supportedChains from "../../../utils/supportedChains";
-import {
-  polygonCollectionTransactions,
-} from "../../../renderless/fetch-data/fetchUserGraphData";
+import { chainCollectionTransactions } from "../../../renderless/fetch-data/fetchUserGraphData";
 
 const ExploreTransactionHistory = ({ collectionId, data, chain, fromCollection }) => {
   const [state, setState] = useState({
@@ -40,7 +38,10 @@ const ExploreTransactionHistory = ({ collectionId, data, chain, fromCollection }
       let data = [];
       switch (supportedChains[chain]?.chain) {
         case "Polygon":
-          data = await polygonCollectionTransactions(collectionId);
+          data = await chainCollectionTransactions(collectionId, "Polygon");
+          break;
+        case "Avalanche":
+          data = await chainCollectionTransactions(collectionId, "Avalanche");
           break;
         default:
           handleSetState({ isAlgoChain: true });

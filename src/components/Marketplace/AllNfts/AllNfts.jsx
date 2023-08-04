@@ -11,12 +11,7 @@ import ChainDropdown from "../Chain-dropdown/chainDropdown";
 import { getCollectionsByCategory, getCollectionsByChain, sortBy } from "../../../pages/Marketplace/Marketplace-script";
 import { setActiveCollection } from "../../../gen-state/gen.actions";
 import NotFound from "../../not-found/notFound";
-import {
-  getAllAvalancheNfts,
-  getAllAvalancheCollections,
-  getAllPolygonCollections,
-  getAllPolygonNfts,
-} from "../../../renderless/fetch-data/fetchUserGraphData";
+import { getAllChainCollections, getAllNftsbyChain } from "../../../renderless/fetch-data/fetchUserGraphData";
 
 const AllNfts = () => {
   const history = useHistory();
@@ -93,14 +88,14 @@ const AllNfts = () => {
   };
 
   useEffect(() => {
-    Promise.all([getAllPolygonCollections(), getAllAvalancheCollections()]).then((data) => {
+    Promise.all([getAllChainCollections("Avalanche"), getAllChainCollections("Polygon")]).then((data) => {
       const filteredData = sortBy({ collections: data.flat(), value: "newest" });
       handleSetState({ collections: filteredData });
     });
   }, []);
 
   useEffect(() => {
-    Promise.all([getAllAvalancheNfts(10), getAllPolygonNfts(10)]).then((data) => {
+    Promise.all([getAllNftsbyChain(10, "Avalanche"), getAllNftsbyChain(10, "Polygon")]).then((data) => {
       handleSetState({ singles: sortBy({ collections: data.flat(), value: "newest" }) });
     });
   }, []);

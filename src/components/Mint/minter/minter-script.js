@@ -1,4 +1,4 @@
-import { mintSingleToPoly, mintToPoly, mintToAvax, mintSingleToAvax } from "../../../utils/arc_ipfs";
+import { mintSingleToChain, mintToChain } from "../../../utils/arc_ipfs";
 
 export const handleMint = async (args) => {
   const { account, chain, dispatch, setNotification, setLoader } = args;
@@ -12,10 +12,8 @@ export const handleMint = async (args) => {
   }
   let url = null;
   try {
-    if (chain.toLowerCase() === "polygon") {
-      url = await mintToPoly({ ...args });
-    } else if (chain.toLowerCase() === "avalanche") {
-      url = await mintToAvax({ ...args });
+    if (chain.toLowerCase() === "polygon" || chain.toLowerCase() === "avalanche") {
+      url = await mintToChain({ ...args }, chain);
     } else {
       dispatch(
         setNotification({
@@ -49,10 +47,8 @@ export const handleSingleMint = async (args) => {
   }
   let url = null;
   try {
-    if (chain.toLowerCase() === "polygon") {
-      url = await mintSingleToPoly({ ...args });
-    } else if (chain.toLowerCase() === "avalanche") {
-      url = await mintSingleToAvax({ ...args });
+    if (chain.toLowerCase() === "polygon" || chain.toLowerCase() === "avalanche") {
+      url = await mintSingleToChain({ ...args }, chain);
     } else {
       dispatch(
         setNotification({

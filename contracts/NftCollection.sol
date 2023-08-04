@@ -24,6 +24,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  *
  * _Available since v3.1._
  */
+
+// FIXME: change this to NftCollection
 contract NftMinter is Initializable, Context, ERC165, ERC2981, IERC1155, IERC1155MetadataURI {
     using Counters for Counters.Counter;
     Counters.Counter private supply;

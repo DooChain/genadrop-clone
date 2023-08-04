@@ -7,7 +7,7 @@ import AllNfts from "../../components/Marketplace/AllNfts/AllNfts";
 const Marketplace = () => (
   <div className={classes.container}>
     <Banner />
-    {/* <FeaturedNfts /> */}
+    <FeaturedNfts />
     <AllNfts />
   </div>
 );

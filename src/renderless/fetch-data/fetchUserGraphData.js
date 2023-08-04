@@ -4,22 +4,13 @@
 import { gql } from "@apollo/client";
 import { ethers } from "ethers";
 import {
-  GET_ALL_POLYGON_COLLECTIONS,
-  GET_AVAX_SINGLE_NFTS,
-  GET_AVAX_SINGLE_NFTS_WITH_LIMIT,
-  GET_AVAX_SOUL_BOUND_NFTS,
-  GET_AVAX_SOUL_BOUND_NFTS_WITH_LIMITS,
-  GET_ALL_AVALANCHE_COLLECTIONS,
-  GET_FEATURED_SINGLE_NFT,
   GET_GRAPH_COLLECTIONS,
+  GET_FEATURED_SINGLE_NFT,
   GET_GRAPH_NFT,
-  GET_POLYGON_SINGLE_NFTS,
-  GET_POLYGON_SINGLE_NFTS_WITH_LIMIT,
-  GET_POLYGON_SOUL_BOUND_NFTS,
-  GET_POLYGON_SOUL_BOUND_NFTS_WITH_LIMITS,
   GET_SINGLE_GRAPH_COLLECTION,
   GET_USER_COLLECTIONS,
   GET_USER_NFT,
+  GET_SIGNLE_NFTS,
 } from "../../graphql/querries/getCollections";
 import {
   getGraphCollection,
@@ -38,194 +29,119 @@ import { avalancheClient, polygonClient, nearClient } from "../../utils/graphqlC
 
 const soulboundSingleFilterAddress = ethers.utils.hexlify(process.env.REACT_APP_POLY_MAINNET_SOULBOUND_ADDRESS);
 
-export const polygonUserData = async (address) => {
-  const { data: polygonData, error: polygonError } = await polygonClient
-    .query(GET_GRAPH_NFT, { id: address })
-    .toPromise();
-  if (polygonError) return;
-  let trHistory;
-  let polygonResult = [];
-  if (polygonData?.nft !== null) {
-    polygonResult = await getGraphNft(polygonData?.nft);
-    trHistory = await getTransactions(polygonData?.nft?.transactions);
-    trHistory.find((t) => {
-      if (t.type === "Minting") t.price = polygonResult[0].price;
-    });
-  }
-  return [polygonResult[0], trHistory];
+const clientByChain = (chainName) => {
+  return chainName === "Polygon" ? polygonClient : chainName === "Avalanche" ? avalancheClient : avalancheClient;
 };
 
-export const getAvalancheNft = async (address) => {
-  const { data: avaxData, error: avaxError } = await avalancheClient.query(GET_GRAPH_NFT, { id: address }).toPromise();
-  if (avaxError) return;
+export const getNftById = async (id, chainName) => {
+  const client = clientByChain(chainName);
+  const { data: nftData, error: nftError } = await client.query(GET_GRAPH_NFT, { id: id }).toPromise();
+  if (nftError) return;
   let trHistory;
-  let avaxResult = [];
-  if (avaxData?.nft !== null) {
-    avaxResult = await getGraphNft(avaxData?.nft);
-    trHistory = await getTransactions(avaxData?.nft?.transactions);
+  let nftResult = [];
+  if (nftData?.nft !== null) {
+    nftResult = await getGraphNft(nftData?.nft);
+    trHistory = await getTransactions(nftData?.nft?.transactions);
     trHistory.find((t) => {
-      if (t.type === "Minting") t.price = avaxResult[0].price;
+      if (t.type === "Minting") t.price = nftResult[0].price;
     });
   }
-  return [avaxResult[0], trHistory];
+  return [nftResult[0], trHistory];
 };
 
-export const getFeaturedAvalancheNft = async (address) => {
-  const { data, error } = await avalancheClient.query(GET_GRAPH_NFT, { id: address }).toPromise();
+export const getFeaturedChainNft = async (address, chainName) => {
+  const { data, error } = await clientByChain(chainName).query(GET_GRAPH_NFT, { id: address }).toPromise();
   if (error) return [];
   const result = await getFeaturedGraphNft(data?.nft);
   return result;
 };
 
-export const getFeaturedPolygonNfts = async (address) => {
-  const { data: polygonData, error: polygonError } = await polygonClient
-    .query(GET_GRAPH_NFT, { id: address })
-    .toPromise();
-  if (polygonError) return [];
-  const result = await getFeaturedGraphNft(polygonData?.nft);
-  return result;
-};
-export const nearFeaturedNfts = async (address) => {
-  const { data, error } = await nearClient.query(GET_FEATURED_SINGLE_NFT, { id: address }).toPromise();
-  if (error) return [];
-  const nearData = await getGraphNft(data?.nft);
-  return nearData;
-};
-
-export const getPolygonNFTToList = async (address, nftId) => {
-  const { data, error: polygonError } = await polygonClient.query(GET_USER_NFT, { id: address }).toPromise();
-  if (polygonError) return;
-  const polygonBoughtNft = await getUserGraphNft(data?.user?.nfts, address);
-  const nft = polygonBoughtNft.filter((NFT) => NFT.tokenID === nftId)[0];
-  return nft;
-};
-
-export const getPolygonCollectedNFTs = async (address) => {
-  const { data, error: polygonError } = await polygonClient.query(GET_USER_NFT, { id: address }).toPromise();
+export const getChainCollectedNFTs = async (address, chainName) => {
+  const { data, error: polygonError } = await clientByChain(chainName).query(GET_USER_NFT, { id: address }).toPromise();
   if (polygonError) return;
   const response = await getSingleGraphNfts(data?.user?.nfts, address);
   const polygonBoughtNft = response?.filter((NFTS) => NFTS.sold === true);
   return polygonBoughtNft;
 };
 
-export const getPolygonMintedNFTs = async (address) => {
-  const { data, error: polygonError } = await polygonClient.query(GET_USER_NFT, { id: address }).toPromise();
-  if (polygonError) return;
+export const getChainMintedNFTs = async (address, chainName) => {
+  const singleMinterAddress =
+    chainName.toLowerCase() === "polygon"
+      ? process.env.REACT_APP_ENV_STAGING === "false"
+        ? ethers.utils.hexlify(process.env.REACT_APP_GENA_MAINNET_SINGLE_ADDRESS)
+        : ethers.utils.hexlify(process.env.REACT_APP_POLY_TESTNET_SINGLE_ADDRESS)
+      : chainName.toLowerCase() === "avalanche"
+      ? process.env.REACT_APP_ENV_STAGING === "false"
+        ? ethers.utils.hexlify(process.env.REACT_APP_AVAX_MAINNET_SINGLE_ADDRESS)
+        : ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS)
+      : ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS);
 
-  const filterAddress =
-    process.env.REACT_APP_ENV_STAGING === "true"
-      ? ethers.utils.hexlify(process.env.REACT_APP_POLY_TESTNET_SINGLE_ADDRESS)
-      : ethers.utils.hexlify(process.env.REACT_APP_GENA_MAINNET_SINGLE_ADDRESS);
+  const { data, error: dataError } = await clientByChain(chainName).query(GET_USER_NFT, { id: address }).toPromise();
+  if (dataError) return;
+
   const response = await getSingleGraphNfts(data?.user?.nfts, data?.user?.id);
-  const polygonMintedNfts = response?.filter(
-    (NFTS) =>
-      !NFTS?.sold && (NFTS?.collectionId === soulboundSingleFilterAddress || NFTS?.collectionId === filterAddress)
+  const mintedNfts = response?.filter(
+    (NFTS) => !NFTS?.sold && NFTS?.collectionId === singleMinterAddress // soulbound address ignored
   );
-  return polygonMintedNfts;
+  return mintedNfts;
 };
 
-export const getAvaxMintedNfts = async (address) => {
-  const { data, error: avaxError } = await avalancheClient.query(GET_USER_NFT, { id: address }).toPromise();
-  if (avaxError) return;
-
-  const filterAddress =
-    process.env.REACT_APP_ENV_STAGING === "true"
-      ? ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS)
-      : ethers.utils.hexlify(process.env.REACT_APP_AVAX_MAINNET_SINGLE_ADDRESS);
-  const response = await getSingleGraphNfts(data?.user?.nfts, data?.user?.id);
-  const avaxMintedNfts = response?.filter(
-    (NFTS) =>
-      !NFTS?.sold && (NFTS?.collectionId === soulboundSingleFilterAddress || NFTS?.collectionId === filterAddress)
-  );
-  return avaxMintedNfts;
-};
-
-export const getPolygonSingleCollection = async (address) => {
-  const { data, error } = await polygonClient.query(GET_SINGLE_GRAPH_COLLECTION, { id: address }).toPromise();
+export const getSingleCollection = async (address, chainName) => {
+  const client =
+    chainName === "Polygon" ? polygonClient : chainName === "Avalanche" ? avalancheClient : avalancheClient;
+  const { data, error } = await client.query(GET_SINGLE_GRAPH_COLLECTION, { id: address }).toPromise();
   if (error) return;
   const nftData = await getGraphCollection(data?.collection?.nfts, data?.collection);
   const collectionData = await getGraphCollectionData(data?.collection);
   return [nftData, collectionData];
 };
 
-export const getAvalancheSingleCollection = async (address) => {
-  const { data, error } = await avalancheClient.query(GET_SINGLE_GRAPH_COLLECTION, { id: address }).toPromise();
-  if (error) return;
-  const nftData = await getGraphCollection(data?.collection?.nfts, data?.collection);
-  const collectionData = await getGraphCollectionData(data?.collection);
-  return [nftData, collectionData];
-};
-
-export const getAvaxCollectedNFTs = async (address) => {
-  const { data, error: auroraError } = await avalancheClient.query(GET_USER_NFT, { id: address }).toPromise();
-  if (auroraError) return;
-  const response = await getSingleGraphNfts(data?.user?.nfts, address);
-  const avaxCollectedNfts = response?.filter((NFTS) => NFTS?.sold === true);
-  return avaxCollectedNfts;
-};
-
-export const getAvaxUserCollections = async (account) => {
-  const { data, error: avaxError } = await avalancheClient.query(GET_USER_COLLECTIONS, { id: account }).toPromise();
+export const getChainUserCollections = async (account, chainName) => {
+  const { data, error: avaxError } = await clientByChain(chainName)
+    .query(GET_USER_COLLECTIONS, { id: account })
+    .toPromise();
   if (avaxError) return;
   const result = await getGraphCollections(data?.user?.collections);
   return result;
 };
 
-export const getPolygonUserCollections = async (account) => {
-  const { data, error: polygonError } = await polygonClient.query(GET_USER_COLLECTIONS, { id: account }).toPromise();
-  if (polygonError) return;
-  const result = await getGraphCollections(data?.user?.collections);
-  return result;
-};
-
-export const getAllPolygonNfts = async (limit) => {
-  const { data: graphData, error } = await polygonClient
-    .query(limit ? GET_POLYGON_SINGLE_NFTS_WITH_LIMIT : GET_POLYGON_SINGLE_NFTS)
-    .toPromise();
-  const { data: sbData, error: sbError } = await polygonClient
-    .query(limit ? GET_POLYGON_SOUL_BOUND_NFTS_WITH_LIMITS : GET_POLYGON_SOUL_BOUND_NFTS)
-    .toPromise();
-
-  if (error || sbError) return [];
-  const data = getSingleGraphNfts([...graphData.nfts, ...sbData.nfts]);
-  return data;
-};
-export const getAllNearNfts = async (limit) => {
-  const { data: graphData, error } = await nearClient
-    .query(limit ? GET_NEAR_SINGLE_NFTS_WITH_LIMIT : GET_NEAR_SINGLE_NFTS)
-    .toPromise();
-  if (error) return [];
-  const data = await getNearSingleGraphNfts(graphData?.nfts);
-  return data;
-};
-
-export const getAllAvalancheNfts = async (limit) => {
-  const { data: graphData, error } = await avalancheClient
-    .query(limit ? GET_AVAX_SINGLE_NFTS_WITH_LIMIT : GET_AVAX_SINGLE_NFTS)
-    .toPromise();
-  const { data: sbData, error: sbError } = await avalancheClient
-    .query(limit ? GET_AVAX_SOUL_BOUND_NFTS_WITH_LIMITS : GET_AVAX_SOUL_BOUND_NFTS)
-    .toPromise();
+export const getAllNftsbyChain = async (limit = 0, chainName) => {
+  const client =
+    chainName === "Polygon" ? polygonClient : chainName === "Avalanche" ? avalancheClient : avalancheClient;
+  const { data: graphData, error } = await client.query(GET_SIGNLE_NFTS(chainName, limit, false)).toPromise();
+  const { data: sbData, error: sbError } = await client.query(GET_SIGNLE_NFTS(chainName, limit, true)).toPromise();
 
   if (error || sbError) return [];
   const data = getSingleGraphNfts([...graphData.nfts, ...sbData.nfts]);
   return data;
 };
 
-export const getAllAvalancheCollections = async () => {
-  const { data, error } = await avalancheClient.query(GET_ALL_AVALANCHE_COLLECTIONS).toPromise();
+export const getAllChainCollections = async (chainName) => {
+  const singleMinterAddress =
+    chainName.toLowerCase() === "polygon"
+      ? process.env.REACT_APP_ENV_STAGING === "false"
+        ? ethers.utils.hexlify(process.env.REACT_APP_GENA_MAINNET_SINGLE_ADDRESS)
+        : ethers.utils.hexlify(process.env.REACT_APP_POLY_TESTNET_SINGLE_ADDRESS)
+      : chainName.toLowerCase() === "avalanche"
+      ? process.env.REACT_APP_ENV_STAGING === "false"
+        ? ethers.utils.hexlify(process.env.REACT_APP_AVAX_MAINNET_SINGLE_ADDRESS)
+        : ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS)
+      : ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS);
+  const { data, error } = await clientByChain(chainName).query(GET_GRAPH_COLLECTIONS).toPromise();
   if (error) return [];
   const result = await getGraphCollections(data?.collections);
   const filterAddress =
     process.env.REACT_APP_ENV_STAGING === "true"
       ? ethers.utils.hexlify(process.env.REACT_APP_AVAX_TESTNET_SINGLE_ADDRESS)
       : ethers.utils.hexlify(process.env.REACT_APP_AVAX_MAINNET_SINGLE_ADDRESS);
-  const res = result?.filter((aurora) => aurora?.Id !== filterAddress && aurora?.Id !== soulboundSingleFilterAddress);
+  const res = result?.filter(
+    (aurora) => aurora?.Id !== singleMinterAddress && aurora?.Id !== soulboundSingleFilterAddress
+  );
   return res;
 };
 
 export const getAllPolygonCollections = async () => {
-  const { data, error } = await polygonClient.query(GET_ALL_POLYGON_COLLECTIONS).toPromise();
+  const { data, error } = await polygonClient.query(GET_GRAPH_COLLECTIONS).toPromise();
   if (error) return [];
   const result = await getGraphCollections(data?.collections);
   const filterAddress =
@@ -236,8 +152,8 @@ export const getAllPolygonCollections = async () => {
   return res;
 };
 
-export const polygonCollectionTransactions = async (id) => {
-  const { data: celoData, error: celoError } = await polygonClient
+export const chainCollectionTransactions = async (id, chainName) => {
+  const { data: chainData, error: chainError } = await clientByChain(chainName)
     .query(
       gql`query MyQuery {
       transactions(
@@ -259,7 +175,7 @@ export const polygonCollectionTransactions = async (id) => {
     }`
     )
     .toPromise();
-  if (celoError) return;
-  const transaction = getGraphTransactionHistory(celoData?.transactions);
+  if (chainError) return;
+  const transaction = getGraphTransactionHistory(chainData?.transactions);
   if (transaction) return (await transaction).reverse();
 };
