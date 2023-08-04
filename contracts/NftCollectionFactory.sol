@@ -12,8 +12,7 @@ interface CollectionInterface {
     function initialize(string memory name_, string memory symbol_, address deployer) external;
 }
 
-// FIXME: change this to NftCollectionFactory
-contract NftCollection is Initializable, UUPSUpgradeable {
+contract NftCollectionFactory is Initializable, UUPSUpgradeable {
     address public TokenImplementation;
     address private owner;
     // store collection addresses
