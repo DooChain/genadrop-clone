@@ -24,8 +24,7 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
  * _Available since v3.1._
  */
 
-//FIXME: change this as well
-contract SingleNftMinter is
+contract NftSingle is
     UUPSUpgradeable,
     ContextUpgradeable,
     ERC165Upgradeable,
@@ -33,9 +32,7 @@ contract SingleNftMinter is
     IERC1155Upgradeable,
     IERC1155MetadataURIUpgradeable
 {
-    using CountersUpgradeable for CountersUpgradeable.Counter;
-    // FIXME: change this to uint256
-    CountersUpgradeable.Counter private supply;
+    uint256 supply;
 
     using AddressUpgradeable for address;
     using StringsUpgradeable for uint;
@@ -72,6 +69,7 @@ contract SingleNftMinter is
         _owner = deployer;
         _name = name_;
         _symbol = symbol_;
+        supply = 0;
         emit CollectionInit(address(this), deployer, _name);
     }
 
@@ -369,7 +367,7 @@ contract SingleNftMinter is
 
         address operator = _msgSender();
 
-        uint256 newItemId = supply.current();
+        uint256 newItemId = supply;
 
         _beforeTokenTransfer(operator, address(0), to, _asSingletonArray(newItemId), _asSingletonArray(amount), data);
 
@@ -380,7 +378,7 @@ contract SingleNftMinter is
 
         _doSafeTransferAcceptanceCheck(operator, address(0), to, newItemId, amount, data);
 
-        supply.increment();
+        supply++;
     }
 
     /**
@@ -572,6 +570,6 @@ contract SingleNftMinter is
     uint256[47] private __gap;
 
     function totalSupply() public view returns (uint256) {
-        return supply.current();
+        return supply;
     }
 }

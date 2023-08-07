@@ -1,14 +1,17 @@
 async function main() {
-  const NFTMarket = await ethers.getContractFactory("NFTMarket");
+  const NFTMarketFactory = await ethers.getContractFactory("NFTMarket");
 
   console.log("Deploying proxy ...");
 
   // console.log("version no. : ", await Nft.sayversion(), await Nft.symbol());
 
-  const Market = await upgrades.deployProxy(NFTMarket, ["GenaDrop"], { kind: "uups", initializer: "initialize" });
+  const NFTMarket = await upgrades.deployProxy(NFTMarketFactory, ["GenaDrop"], {
+    kind: "uups",
+    initializer: "initialize",
+  });
 
-  console.log("proxy deployed to:", Market.address);
-  console.log(await Market._itemsSold());
+  console.log("proxy deployed to:", NFTMarket.address);
+  console.log(await NFTMarket._itemsSold());
 }
 
 main()

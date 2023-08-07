@@ -4,7 +4,7 @@ const main = async () => {
   //   process.env.STAGING_QUICKNODE_KEY
   // );
   // const signer = hre.ethers.getSigner(process.env.PRIVATE_KEY, provider);
-  let baseContract = await hre.ethers.getContractFactory("SingleNftMinter");
+  let baseContract = await hre.ethers.getContractFactory("NftCollection");
   let contract = baseContract.attach(contractAddress);
 
   console.log(contract.address);
