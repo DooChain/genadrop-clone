@@ -112,22 +112,28 @@ export const getGraphCollections = async (collections) => {
     const fetch = async (resolve, reject) => {
       try {
         const collectionObj = {};
-        const { data } = await axios.get(
-          collection?.nfts[0]?.tokenIPFSPath.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/")
-        );
-        collectionObj.image_url = data?.image.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
-
+        if (collection.nfts.length > 0) {
+          const { data } = await axios.get(
+            collection?.nfts[0]?.tokenIPFSPath.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/")
+          );
+          collectionObj.image_url = data?.image.replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
+        }
         collectionObj.name = collection?.name;
         collectionObj.owner = collection?.creator?.id;
         collectionObj.Id = collection?.id;
-        const getPrice = collection?.nfts.map((col) => col.price).reduce((a, b) => (a < b ? a : b));
-        const chain = collection?.nfts?.map((col) => col.chain).reduce((a, b) => a === b && a);
+        const getPrice = collection.nfts.length
+          ? collection?.nfts.map((col) => col.price).reduce((a, b) => (a < b ? a : b))
+          : 0;
+        const chain = collection.nfts.length
+          ? collection?.nfts?.map((col) => col.chain).reduce((a, b) => a === b && a)
+          : 0;
         collectionObj.chain = chain;
         collectionObj.price = (getPrice * PRICE_CONVERSION_VALUE).toString();
         collectionObj.description = collection?.description;
         collectionObj.isListed = collection?.isListed ? collection?.isListed : false;
         collectionObj.nfts = collection?.nfts;
-        collectionObj.createdAt = new Date(Number(collection?.nfts?.[0].createdAtTimestamp) * 1000);
+        collectionObj.createdAt =
+          new Date(Number(collection.nfts.length ? collection?.nfts?.[0].createdAtTimestamp : 0)) * 1000;
         collectionObj.transactions = collection?.nfts?.transactions;
         resolve(collectionObj);
       } catch (err) {
